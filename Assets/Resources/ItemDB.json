@@ -1,0 +1,90 @@
+[{
+		"Name": "Crude Oil",
+		"Description": "Oil that has not yet been refined; Black Gold.",
+		"Weight": 0.0,
+		"SpritePath": "Sprites/Items/rpgItems25"
+	},
+	{
+		"Name": "Coal",
+		"Description": "Dinosaur bones. Carbon.  Combine with a stick and you get a torch. Probably?",
+		"Weight": 0.0,
+		"SpritePath": "Sprites/Items/rpgItems26",
+		"Limit": 1
+	},
+	{
+		"Name": "Scrap Iron",
+		"Description": "Mangled bits of what was once something mighty... and made of iron",
+		"Weight": 0.0,
+		"SpritePath": "Sprites/Items/rpgItems27",
+		"Limit": 15
+	},
+	{
+		"Name": "Scrap Copper",
+		"Description": "Mangled bits of what was once technical and conductive... and made of copper",
+		"Weight": 0.0,
+		"SpritePath": "Sprites/Items/rpgItems28"
+	},
+	{
+		"Name": "Petroleum",
+		"Description": "Crude Oil that has been refined for a standard combustion engine.",
+		"Weight": 0.0,
+		"SpritePath": "",
+		"RequiredFactory": "Refinery",
+		"Ingredients": {
+			"Crude Oil":5
+		}
+	},
+	{
+		"Name": "Iron",
+		"Description": "Shiny chunks of Iron for construction of something mighty!",
+		"Weight": 0.0,
+		"SpritePath": "",
+		"RequiredFactory": "Forge",
+		"Ingredients": {
+			"Scrap Iron":2
+		}
+	},
+	{
+		"Name": "Copper",
+		"Description": "Cold chunks of Copper for construction of something technical and conductive? I guess?",
+		"Weight": 0.0,
+		"SpritePath": "",
+		"RequiredFactory": "Forge",
+		"Ingredients": {
+			"Scrap Copper":1
+		}
+	},
+	{
+		"Name": "Diesel",
+		"Description": "Crude Oil that has been refined for a tougher combustion engine. Dinosaur bones go boom.",
+		"Weight": 0.0,
+		"SpritePath": "",
+		"RequiredFactory": "Advanced Refinery",
+		"Ingredients": {
+			"Crude Oil":10
+		}
+	},
+	{
+		"Name": "Steel",
+		"Description": "Mighty Metal meets Dinosaur bones.  No, not that game.",
+		"Weight": 0.0,
+		"SpritePath": "",
+		"RequiredFactory": "Advanced Forge",
+		"Ingredients": {
+			"Coal":1,
+			"Iron":2
+		}
+	},
+	{
+		"Name": "Alloy",
+		"Description": "I am become death, destroy of worlds.  Just kidding, it's an alloyed metal.  Is it any good?  Who knows.",
+		"Weight": 0.0,
+		"SpritePath": "",
+		"RequiredFactory": "Advanced Forge",
+		"Ingredients": {
+			"Iron" : 4,
+			"Copper" : 2,
+			"Steel" : 1
+		}
+	}
+]
