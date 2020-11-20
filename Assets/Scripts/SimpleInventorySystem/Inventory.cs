@@ -3,9 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SimpleInventorySystem;
 
 namespace SimpleInventorySystem
 {
+    public enum InventoryEventType
+    {
+        DELETE,
+        UPDATE,
+        CREATE
+    }
+
+    public class InventoryEventArgs : EventArgs
+    {
+        public InventoryEventType InventoryEventType;
+
+        public InventoryEventArgs(InventoryEventType _InventoryEvent, int Slot)
+        {
+            InventoryEventType = _InventoryEvent;
+        }
+    }
+
     public class Inventory : MonoBehaviour
     {
         public int maxSize = 9;
@@ -15,6 +33,8 @@ namespace SimpleInventorySystem
         public int NextEmpty => Array.IndexOf(Items, null);
         public int ItemLimit = 100;
         public bool ignoreItemLimit = false;
+
+        public event EventHandler InventoryEvent;
 
         private void Awake()
         {
@@ -54,6 +74,7 @@ namespace SimpleInventorySystem
                         int _toAdd = ignoreItemLimit ? qty : Math.Min(qty, Items[_index].Limit);
                         Items[_index].Quantity += _toAdd;
                         _remaining -= _toAdd;
+                        InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _index));
                     }
                 }
                 else
@@ -99,6 +120,7 @@ namespace SimpleInventorySystem
                     int _toSubtract= Math.Min(qty, Items[_index].Quantity);
                     Items[_index].Quantity -= _toSubtract;
                     _remaining -= _toSubtract;
+                    InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _index));
                 }
             }
             else
