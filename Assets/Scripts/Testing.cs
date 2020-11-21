@@ -40,7 +40,7 @@ public class Testing : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.J))
         {
             Debug.Log($"Adding {ItemDatabase.FetchItemByID(0).Name} to inventory slot {inventory2.NextEmpty}");
-            inventory.SwapItems(ref inventory.Items[0], ref inventory2.Items[0]);
+            inventory.ExchangeItems(0, inventory2, 0);
         }
 
         if (Input.GetKeyDown(KeyCode.F))
