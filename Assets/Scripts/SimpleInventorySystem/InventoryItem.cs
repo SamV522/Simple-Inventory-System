@@ -32,6 +32,7 @@ namespace SimpleInventorySystem
 
         public InventoryItem(InventoryItem inventoryItem)
         {
+            if (inventoryItem == null) return;
             ID = inventoryItem.ID;
             Quantity = inventoryItem.Quantity;
         }

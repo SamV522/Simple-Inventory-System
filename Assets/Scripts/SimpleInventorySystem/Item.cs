@@ -19,7 +19,6 @@ namespace SimpleInventorySystem
         public Item()
         {
             ID = ItemDatabase.Items.Count;
-            Debug.Log(ItemDatabase.Items.Count);
             Name = "Base Item";
         }
 

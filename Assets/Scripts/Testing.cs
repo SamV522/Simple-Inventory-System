@@ -33,13 +33,13 @@ public class Testing : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.T))
         {
-            Debug.Log($"Adding {ItemDatabase.FetchItemByID(1).Name} to inventory slot {inventory.NextEmpty}");
+            Debug.Log($"Adding {ItemDatabase.FetchItemByID(1).Name} to inventory {inventory}");
             inventory.AddItem(1, 1);
         }
 
         if (Input.GetKeyDown(KeyCode.J))
         {
-            Debug.Log($"Adding {ItemDatabase.FetchItemByID(0).Name} to inventory slot {inventory2.NextEmpty}");
+            Debug.Log($"Exchanging {inventory.Items[0]?.Name??"Nothing"} with {inventory2.Items[0]?.Name??"Nothing"} from {inventory2}");
             inventory.ExchangeItems(0, inventory2, 0);
         }
 

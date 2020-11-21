@@ -17,10 +17,12 @@ namespace SimpleInventorySystem
     public class InventoryEventArgs : EventArgs
     {
         public InventoryEventType InventoryEventType;
+        public int? Slot;
 
-        public InventoryEventArgs(InventoryEventType _InventoryEvent, int Slot)
+        public InventoryEventArgs(InventoryEventType _InventoryEvent, int? _Slot = null)
         {
             InventoryEventType = _InventoryEvent;
+            Slot = _Slot; 
         }
     }
 
@@ -34,11 +36,34 @@ namespace SimpleInventorySystem
         public int ItemLimit = 100;
         public bool ignoreItemLimit = false;
 
-        public event EventHandler InventoryEvent;
+        public event EventHandler<InventoryEventArgs> InventoryEvent;
 
         private void Awake()
         {
             Items = new InventoryItem[maxSize];
+            InventoryEvent += e_InventoryEventHandler;
+        }
+
+        private void e_InventoryEventHandler(object sender, InventoryEventArgs e)
+        {
+            /// TODO: sender may be from another inventory, this might need to have a check to make sure the sender is allowed to change this inventory.
+            // REMINDER: sender may be from another inventory 
+            switch (e.InventoryEventType)
+            {
+                case InventoryEventType.CREATE:
+                    break;
+                case InventoryEventType.UPDATE:
+                    if(e.Slot.HasValue && Items[e.Slot.Value].Quantity<=0)
+                    {
+                        Items[e.Slot.Value] = null;
+                    }
+                    break;
+                case InventoryEventType.DELETE:
+                    break;
+                default:
+                    // ???
+                    break;
+            }
         }
 
         public int[] AllIndicesOf(int id)
@@ -71,7 +96,9 @@ namespace SimpleInventorySystem
                 {
                     foreach (int _index in _indices)
                     {
-                        int _toAdd = ignoreItemLimit ? qty : Math.Min(qty, Items[_index].Limit);
+                        // Quantity DIFFERENCE Limit 
+                        int _toAdd = ignoreItemLimit ? qty : Math.Min(qty, Items[_index].Limit - Items[_index].Quantity);
+                        Debug.Log(_toAdd);
                         Items[_index].Quantity += _toAdd;
                         _remaining -= _toAdd;
                         InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _index));
@@ -86,12 +113,10 @@ namespace SimpleInventorySystem
             return _success;
         }
 
-        /// TODO: make a function that exchanges items between inventories
         public bool ExchangeItems(int _sourceSlot, Inventory _targetInventory, int _targetSlot)
         {
-            bool _success = false;
-            InventoryItem oldSource = new InventoryItem(Items[_sourceSlot]);
-            InventoryItem oldDestination = new InventoryItem(_targetInventory.Items[_targetSlot]);
+            InventoryItem oldSource = new InventoryItem(Items[_sourceSlot])??null;
+            InventoryItem oldDestination = new InventoryItem(_targetInventory.Items[_targetSlot])??null;
             _targetInventory.Items[_targetSlot] = oldSource;
             Items[_sourceSlot] = oldDestination;
             _targetInventory.InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _targetSlot));
@@ -99,12 +124,14 @@ namespace SimpleInventorySystem
             return _targetInventory.Items[_targetSlot] == oldSource && Items[_sourceSlot] == oldDestination;
         }
 
-        /// TODO: Referencing items from different inventorys also won't allow to the chance to raise events, this will need to be event based. fuck.
         public bool SwapSlots(int SlotSource, int SlotDest)
         {
             bool _success = false;
+
+            // This is prone to errors, since the constructor 
             InventoryItem oldDestination = new InventoryItem(Items[SlotDest]);
             InventoryItem oldSource = new InventoryItem(Items[SlotSource]);
+            
             if(oldDestination!=null && oldSource!=null)
             {
                 Items[SlotSource] = oldDestination;
@@ -157,23 +184,10 @@ namespace SimpleInventorySystem
             return _success;
         }
 
-        public void UpdateItemQuantity(int Slot)
-        {
-            if(Items[Slot].Quantity<=0)
-            {
-                Items[Slot] = null;
-                InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.DELETE, Slot));
-            }
-        }
-
         public void TestPrintInventory()
         {
-            Debug.Log(Items.Length);
-            Debug.Log(NextEmpty);
-            Debug.Log(Size);
             for(int i=0;i< Size;i++)
             {
-                Debug.Log(i);
                 if(Items[i]!=null)
                 {
                     Debug.Log($"{Items[i].Name} x {Items[i].Quantity}");

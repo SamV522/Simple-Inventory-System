@@ -13,13 +13,11 @@ namespace SimpleInventorySystem
 
         public static void GenerateItems()
         {
-            /// TODO: generate list of items from JSON here.
             Items = JsonMapper.ToObject<List<Item>>(File.ReadAllText(Application.dataPath + "/Resources/ItemDB.json"));
             int i = 0;
             foreach(Item item in Items)
             {
                 item.ID = i;
-                Debug.Log($"{item.ID}: {item.Name}");
                 i++;
             }
             IsGenerated = true;

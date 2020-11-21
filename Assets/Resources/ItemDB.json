@@ -9,7 +9,7 @@
 		"Description": "Dinosaur bones. Carbon.  Combine with a stick and you get a torch. Probably?",
 		"Weight": 0.0,
 		"SpritePath": "Sprites/Items/rpgItems26",
-		"Limit": 1
+		"Limit": 10
 	},
 	{
 		"Name": "Scrap Iron",
