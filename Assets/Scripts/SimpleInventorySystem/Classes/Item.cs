@@ -4,13 +4,23 @@ using UnityEngine;
 
 namespace SimpleInventorySystem
 {
-    public class Item : Collection<Item>
+    public enum ItemLimitType
     {
+        Item,
+        Inventory,
+        Global,
+        None
+    }
+
+    public class Item
+    {
+
         public int ID { get; set; }
         public string Name { get; private set; }
-        public string Desc { get; private set; } = "There is no description";
+        public string Description { get; private set; } = "There is no description";
         public float Weight { get; private set; } = 0.0f;
         public int Limit { get; private set; } = ItemDatabase.DefaultItemLimit;
+        public ItemLimitType LimitType { get; private set; } = ItemLimitType.Global;
         public string SpritePath { get; private set; }
         public string RequiredFactory { get; private set; }
         public Dictionary<string, int> Ingredients { get; protected set; }
@@ -32,14 +42,14 @@ namespace SimpleInventorySystem
         {
             ID = _ID;
             Name = _Name;
-            Desc = _Desc;
+            Description = _Desc;
         }
 
         public Item(int _ID, string _Name, string _Desc, float _Weight)
         {
             ID = _ID;
             Name = _Name;
-            Desc = _Desc;
+            Description = _Desc;
             Weight = _Weight;
         }
 
@@ -47,7 +57,7 @@ namespace SimpleInventorySystem
         {
             ID = _ID;
             Name = _Name;
-            Desc = _Desc;
+            Description = _Desc;
             Weight = _Weight;
             Limit = _Limit;
         }

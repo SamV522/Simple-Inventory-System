@@ -55,7 +55,7 @@ namespace SimpleInventorySystem
                 case InventoryEventType.UPDATE:
                     if(e.Slot.HasValue && Items[e.Slot.Value].Quantity<=0)
                     {
-                        Items[e.Slot.Value] = null;
+                        SetItem(e.Slot.Value, null);
                     }
                     break;
                 case InventoryEventType.DELETE:
@@ -85,40 +85,55 @@ namespace SimpleInventorySystem
             return (_index.Length>0, _index);
         }
 
+        public (bool, int[]) ItemsWithSpaceFor(int id)
+        {
+            List<int> Indices = new List<int>();
+            for (int i = 0; i < Items.Length; i++)
+            {
+                if (Items[i] != null && Items[i].ID == id && !Items[i].IsFull)
+                {
+                    Indices.Add(i);
+                }
+            }
+            return (Indices.Count>0,Indices.ToArray());
+        }
+
         public bool AddItem(int id, int qty)
         {
             bool _success = false;
             int _remaining = qty;
-            if(!IsFull)
+            (bool _exists, int[] _indices) = ItemsWithSpaceFor(id);
+            if (_exists)
             {
-                (bool _exists, int[] _indices) = ItemExists(id);
-                if (_exists)
+                foreach (int _index in _indices)
                 {
-                    foreach (int _index in _indices)
-                    {
-                        // Quantity DIFFERENCE Limit 
-                        int _toAdd = ignoreItemLimit ? qty : Math.Min(qty, Items[_index].Limit - Items[_index].Quantity);
-                        Debug.Log(_toAdd);
-                        Items[_index].Quantity += _toAdd;
-                        _remaining -= _toAdd;
-                        InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _index));
-                    }
-                }
-                else
-                {
-                    Items[NextEmpty] = new InventoryItem(ItemDatabase.FetchItemByID(id), ignoreItemLimit ? qty : Math.Min(qty, ItemDatabase.FetchItemByID(id).Limit));
+                    // Quantity DIFFERENCE Limit 
+                    int _toAdd = ignoreItemLimit ? qty : Math.Min(qty, Items[_index].Limit - Items[_index].Quantity);
+                    Items[_index].Quantity += _toAdd;
+                    _remaining -= _toAdd;
+                    InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _index));
                 }
                 _success = _remaining == 0;
+            }else if (!IsFull)
+            {
+                SetItem(NextEmpty, new InventoryItem(ItemDatabase.FetchItemByID(id), ignoreItemLimit? qty : Math.Min(qty, ItemDatabase.FetchItemByID(id).Limit)));
             }
             return _success;
+        }
+
+        public void SetItem(int index, InventoryItem inventoryItem)
+        {
+            Items[index] = inventoryItem;
+            if (inventoryItem == null) return;
+            inventoryItem.Inventory = this;
         }
 
         public bool ExchangeItems(int _sourceSlot, Inventory _targetInventory, int _targetSlot)
         {
             InventoryItem oldSource = new InventoryItem(Items[_sourceSlot])??null;
             InventoryItem oldDestination = new InventoryItem(_targetInventory.Items[_targetSlot])??null;
-            _targetInventory.Items[_targetSlot] = oldSource;
-            Items[_sourceSlot] = oldDestination;
+            _targetInventory.SetItem(_targetSlot, oldSource);
+            SetItem(_sourceSlot, oldDestination);
             _targetInventory.InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _targetSlot));
             InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _sourceSlot));
             return _targetInventory.Items[_targetSlot] == oldSource && Items[_sourceSlot] == oldDestination;
@@ -134,8 +149,8 @@ namespace SimpleInventorySystem
             
             if(oldDestination!=null && oldSource!=null)
             {
-                Items[SlotSource] = oldDestination;
-                Items[SlotDest] = oldSource;
+                SetItem(SlotSource, oldDestination);
+                SetItem(SlotDest, oldSource);
                 _success = Items[SlotSource] == oldDestination && Items[SlotDest] == oldSource;
                 InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, SlotSource));
                 InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, SlotDest));
@@ -169,7 +184,7 @@ namespace SimpleInventorySystem
             {
                 foreach(int _index in _indices)
                 {
-                    int _toSubtract= Math.Min(qty, Items[_index].Quantity);
+                    int _toSubtract= Math.Min(_remaining, Items[_index].Quantity);
                     Items[_index].Quantity -= _toSubtract;
                     _remaining -= _toSubtract;
                     InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _index));

@@ -23,6 +23,16 @@ namespace SimpleInventorySystem
             IsGenerated = true;
         }
 
+        public static void TestSaveDatabase()
+        {
+            File.WriteAllText(Application.dataPath + "/Resources/Test_ItemDB.json", JsonMapper.ToJson(Items));
+        }
+
+        public static void TestPrintDatabase()
+        {
+            Debug.Log(Items[0].LimitType);
+        }
+
         public static Item FetchItemByID(int ID)
         {
             return Items[ID];

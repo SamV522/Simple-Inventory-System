@@ -59,5 +59,20 @@ public class Testing : MonoBehaviour
         {
             inventory.TestPrintInventory();
         }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            ItemDatabase.TestPrintDatabase();
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            ItemDatabase.TestSaveDatabase();
+        }
+
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            Debug.Log(JsonUtility.ToJson(ItemDatabase.Items[0]));
+        }
     }
 }
