@@ -37,6 +37,19 @@ namespace SimpleInventorySystem
         {
             return Items[ID];
         }
+
+        public static Item FetchByName(string Name)
+        {
+            Item retItem = null;
+            foreach(Item item in Items)
+            {
+                if(item.Name == Name)
+                {
+                    return item;
+                }
+            }
+            return retItem;
+        }
     }
 }
 
