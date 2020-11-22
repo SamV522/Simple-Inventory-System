@@ -33,6 +33,7 @@ namespace SimpleInventorySystem
         public int Size { get { return Items.Count(x => x != null); } }
         public bool IsFull => Size >= maxSize;
         public int NextEmpty => Array.IndexOf(Items, null);
+        public int CountEmptySlots => Items.Count(x => x == null);
         public int ItemLimit = 100;
         public bool ignoreItemLimit = false;
 
@@ -85,30 +86,51 @@ namespace SimpleInventorySystem
             return (_index.Length>0, _index);
         }
 
-        public (bool, int[]) ItemsWithSpaceFor(int id)
+        public (bool, int[], int) ItemsWithSpaceFor(int id)
         {
             List<int> Indices = new List<int>();
+            int spaces = 0;
             for (int i = 0; i < Items.Length; i++)
             {
                 if (Items[i] != null && Items[i].ID == id && !Items[i].IsFull)
                 {
                     Indices.Add(i);
+                    spaces += Items[i].RemainingSpace;
                 }
             }
-            return (Indices.Count>0,Indices.ToArray());
+            return (Indices.Count>0,Indices.ToArray(), spaces);
+        }
+
+        public (bool, int) CanFit(int id, int qty)
+        {
+            (bool _hasItems, _, int _qty) = ItemsWithSpaceFor(id);
+            if(!_hasItems || _qty < qty)
+            {
+                return (SlotsToFit(id, qty) <= CountEmptySlots, qty);
+            }
+            else
+            {
+                return (_hasItems || !IsFull, _qty);
+            }
+        }
+
+        public int SlotsToFit(int id, int qty)
+        {
+            int _stackLimit = ItemDatabase.FetchItemByID(id).Limit;
+            return (qty % _stackLimit) + 1;
         }
 
         public bool AddItem(int id, int qty)
         {
             bool _success = false;
             int _remaining = qty;
-            (bool _exists, int[] _indices) = ItemsWithSpaceFor(id);
+            (bool _exists, int[] _indices, _) = ItemsWithSpaceFor(id);
             if (_exists)
             {
                 foreach (int _index in _indices)
                 {
                     // Quantity DIFFERENCE Limit 
-                    int _toAdd = ignoreItemLimit ? qty : Math.Min(qty, Items[_index].Limit - Items[_index].Quantity);
+                    int _toAdd = ignoreItemLimit ? qty : Math.Min(_remaining, Items[_index].RemainingSpace);
                     Items[_index].Quantity += _toAdd;
                     _remaining -= _toAdd;
                     InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, _index));
@@ -116,7 +138,18 @@ namespace SimpleInventorySystem
                 _success = _remaining == 0;
             }else if (!IsFull)
             {
-                SetItem(NextEmpty, new InventoryItem(ItemDatabase.FetchItemByID(id), ignoreItemLimit? qty : Math.Min(qty, ItemDatabase.FetchItemByID(id).Limit)));
+                int _requiredSlots = SlotsToFit(id, qty);
+                if(_requiredSlots <= CountEmptySlots)
+                {
+                    for (int i = 0; i < SlotsToFit(id, qty); i++)
+                    {
+
+                        int targetSlot = NextEmpty;
+                        SetItem(targetSlot, new InventoryItem(ItemDatabase.FetchItemByID(id), 
+                                                            ignoreItemLimit ? qty : Math.Min(qty, ItemDatabase.FetchItemByID(id).Limit)));
+                    }
+                    _success = true;
+                }
             }
             return _success;
         }

@@ -10,10 +10,35 @@ namespace SimpleInventorySystem
         public string Name => ItemDatabase.FetchItemByID(ID).Name;
         public string Description => ItemDatabase.FetchItemByID(ID).Description;
         public float Weight => ItemDatabase.FetchItemByID(ID).Weight;
-        public int Limit => ItemDatabase.FetchItemByID(ID).Limit;
         public ItemLimitType LimitType => ItemDatabase.FetchItemByID(ID).LimitType;
+        public int Limit => GetLimit();
         public bool IsFull => CheckIfFull();
+        public int RemainingSpace => Limit - Quantity;
         public Inventory Inventory;
+
+        private int GetLimit()
+        {
+            int _limit = ItemDatabase.FetchItemByID(ID).Limit;
+            switch (LimitType)
+            {
+                case ItemLimitType.Global:
+                    _limit =  ItemDatabase.DefaultItemLimit;
+                    break;
+                case ItemLimitType.Item:
+                    _limit = ItemDatabase.FetchItemByID(ID).Limit;
+                    break;
+                case ItemLimitType.None:
+                    _limit = int.MaxValue;
+                    break;
+                case ItemLimitType.Inventory:
+                    _limit = Inventory.ItemLimit;
+                    break;
+                default:
+                    _limit = int.MaxValue;
+                    break;
+            }
+            return _limit;
+        }
 
         private bool CheckIfFull()
         {

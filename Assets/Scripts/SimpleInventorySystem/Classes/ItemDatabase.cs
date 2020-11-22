@@ -29,7 +29,7 @@ namespace SimpleInventorySystem
             return Items[ID];
         }
 
-        public static Item FetchByName(string Name)
+        public static Item FetchItemByName(string Name)
         {
             Item retItem = null;
             foreach(Item item in Items)
