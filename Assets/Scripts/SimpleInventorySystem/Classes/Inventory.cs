@@ -80,32 +80,37 @@ namespace SimpleInventorySystem
             return Indices.ToArray();
         }
 
-        public bool HasIngredients(Item item, int Qty)
+        public (bool,int) HasIngredients(Item item, int Qty)
         {
-            bool retVal = false;
+            bool retBool = false;
+            int retInt = 0;
             foreach(KeyValuePair<string,int> ingredient in item.Ingredients)
             {
                 Item _ingredientItem = ItemDatabase.FetchItemByName(ingredient.Key);
-                if(HasItemQuantity(_ingredientItem.ID,ingredient.Value*Qty))
+                (bool hasQty, int invQty) = HasItemQuantity(_ingredientItem.ID, ingredient.Value * Qty);
+                if (hasQty)
                 {
-                    retVal = true;
+                    retBool = true;
+                    retInt = Math.Min(retInt, Math.Min(Qty, invQty/ingredient.Value));
                 }
                 else
                 {
-                    retVal = false;
+                    retBool = false;
+                    retInt = 0;
+                    return (retBool, retInt);
                 }
             }
-            return retVal;
+            return (retBool,retInt);
         }
 
-        public bool HasItemQuantity(int id, int qty)
+        public (bool,int) HasItemQuantity(int id, int qty)
         {
             int _qty = 0;
             foreach(int idx in AllIndicesOf(id))
             {
                 _qty += Items[idx].Quantity;
             }
-            return _qty >= qty;
+            return (_qty >= qty, _qty);
         }
 
         public (bool,int[]) ItemExists(int id)
