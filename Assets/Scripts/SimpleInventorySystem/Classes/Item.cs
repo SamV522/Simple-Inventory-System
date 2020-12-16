@@ -24,6 +24,7 @@ namespace SimpleInventorySystem
         public string SpritePath { get; private set; }
         public string RequiredFactory { get; private set; }
         public Dictionary<string, int> Ingredients { get; protected set; }
+        public int ProductionOutput = ItemDatabase.DefaultProductionOutput;
         public bool Craftable => Ingredients != null;
 
         public Item()
@@ -60,6 +61,16 @@ namespace SimpleInventorySystem
             Description = _Desc;
             Weight = _Weight;
             Limit = _Limit;
+        }
+
+        public Item(int _ID, string _Name, string _Desc, float _Weight, int _Limit, int _ProductionOutput)
+        {
+            ID = _ID;
+            Name = _Name;
+            Description = _Desc;
+            Weight = _Weight;
+            Limit = _Limit;
+            ProductionOutput = _ProductionOutput;
         }
     }
 }

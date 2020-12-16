@@ -7,6 +7,7 @@ using SimpleInventorySystem;
 
 namespace SimpleInventorySystem
 {
+    /// TODO: This should have create/add/remove/update/delete
     public enum InventoryEventType
     {
         DELETE,
@@ -48,7 +49,7 @@ namespace SimpleInventorySystem
         private void e_InventoryEventHandler(object sender, InventoryEventArgs e)
         {
             /// TODO: sender may be from another inventory, this might need to have a check to make sure the sender is allowed to change this inventory.
-            // REMINDER: sender may be from another inventory 
+            /// REMINDER: sender may be from another inventory 
             switch (e.InventoryEventType)
             {
                 case InventoryEventType.CREATE:
@@ -91,7 +92,9 @@ namespace SimpleInventorySystem
                 if (hasQty)
                 {
                     retBool = true;
-                    retInt = Math.Min(retInt, Math.Min(Qty, invQty/ingredient.Value));
+                    retInt = retInt == 0 ? invQty / ingredient.Value : retInt;
+                    int newInt = Math.Min(retInt, Math.Min(Qty, ingredient.Value * Qty));
+                    retInt = retInt > newInt ? newInt : retInt;
                 }
                 else
                 {
@@ -150,7 +153,7 @@ namespace SimpleInventorySystem
         public int SlotsToFit(int id, int qty)
         {
             int _stackLimit = ItemDatabase.FetchItemByID(id).Limit;
-            return (qty % _stackLimit) + 1;
+            return Math.Min(1, (qty % _stackLimit));
         }
 
         public bool AddItem(int id, int qty)
@@ -180,6 +183,7 @@ namespace SimpleInventorySystem
                         int targetSlot = NextEmpty;
                         SetItem(targetSlot, new InventoryItem(ItemDatabase.FetchItemByID(id), 
                                                             ignoreItemLimit ? qty : Math.Min(qty, ItemDatabase.FetchItemByID(id).Limit)));
+                        InventoryEvent?.Invoke(this, new InventoryEventArgs(InventoryEventType.UPDATE, targetSlot));
                     }
                     _success = true;
                 }

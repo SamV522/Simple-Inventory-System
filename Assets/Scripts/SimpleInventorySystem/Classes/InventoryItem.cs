@@ -18,50 +18,26 @@ namespace SimpleInventorySystem
 
         private int GetLimit()
         {
-            int _limit = ItemDatabase.FetchItemByID(ID).Limit;
-            switch (LimitType)
+            switch(LimitType)
             {
-                case ItemLimitType.Global:
-                    _limit =  ItemDatabase.DefaultItemLimit;
-                    break;
-                case ItemLimitType.Item:
-                    _limit = ItemDatabase.FetchItemByID(ID).Limit;
-                    break;
-                case ItemLimitType.None:
-                    _limit = int.MaxValue;
-                    break;
-                case ItemLimitType.Inventory:
-                    _limit = Inventory.ItemLimit;
-                    break;
-                default:
-                    _limit = int.MaxValue;
-                    break;
-            }
-            return _limit;
+                case ItemLimitType.Global: return ItemDatabase.DefaultItemLimit;
+                case ItemLimitType.Item: return ItemDatabase.FetchItemByID(ID).Limit;
+                case ItemLimitType.None: return int.MaxValue;
+                case ItemLimitType.Inventory: return Inventory.ItemLimit;
+                default: return int.MaxValue;
+            };
         }
 
         private bool CheckIfFull()
         {
-            bool _full = false;
-            switch (LimitType)
+            switch(LimitType)
             {
-                case ItemLimitType.Global:
-                    _full = Quantity >= ItemDatabase.DefaultItemLimit;
-                    break;
-                case ItemLimitType.Item:
-                    _full = Quantity >= Limit;
-                    break;
-                case ItemLimitType.None:
-                    _full = false;
-                    break;
-                case ItemLimitType.Inventory:
-                    _full = Quantity >= Inventory.ItemLimit;
-                    break;
-                default:
-                    _full = true;
-                    break;
-            }
-            return _full;
+                case ItemLimitType.Global: return Quantity >= ItemDatabase.DefaultItemLimit;
+                case ItemLimitType.Item: return Quantity >= Limit;
+                case ItemLimitType.None: return false;
+                case ItemLimitType.Inventory: return Quantity >= Inventory.ItemLimit;
+                default: return true;
+            };
         }
 
         public InventoryItem(int _ID)

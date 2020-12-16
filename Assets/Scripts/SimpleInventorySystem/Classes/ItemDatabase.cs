@@ -9,16 +9,22 @@ namespace SimpleInventorySystem
     {
         public static List<Item> Items = new List<Item>();
         public static int DefaultItemLimit = 10;
+        public static int DefaultProductionOutput = 1;
         public static bool IsGenerated { get; private set; } = false;
+        public static bool GenerateIDs { get; private set; } = true;
 
         public static void GenerateItems()
         {
-            Items = JsonMapper.ToObject<List<Item>>(File.ReadAllText(Application.dataPath + "/Resources/ItemDB.json"));
-            int i = 0;
-            foreach(Item item in Items)
+            TextAsset itemDb = Resources.Load("ItemDB") as TextAsset;
+            Items = JsonMapper.ToObject<List<Item>>(itemDb.text);
+            if(GenerateIDs)
             {
-                item.ID = i;
-                i++;
+                int i = 0;
+                foreach (Item item in Items)
+                {
+                    item.ID = i;
+                    i++;
+                }
             }
             IsGenerated = true;
         }
@@ -53,6 +59,27 @@ namespace SimpleInventorySystem
                 {
                     //Item is craftable at the right factory.
                     retItems.Add(_item);
+                }
+            }
+            return retItems;
+        }
+
+        public static List<Item> FetchRecipesByItem(Item item)
+        {
+            List<Item> retItems = new List<Item>();
+            foreach (Item _item in retItems)
+            {
+                if (_item.Craftable)
+                {
+                    //Item is craftable at the right factory.
+                    foreach (KeyValuePair<string, int> _ingredient in _item.Ingredients)
+                    {
+                        if (_ingredient.Key == item.Name)
+                        {
+                            // item is an ingredient of _item
+                            retItems.Add(_item);
+                        }
+                    }
                 }
             }
             return retItems;
