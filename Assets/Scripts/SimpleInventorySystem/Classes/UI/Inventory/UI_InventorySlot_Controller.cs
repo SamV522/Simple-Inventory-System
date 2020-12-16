@@ -12,11 +12,6 @@ public class UI_InventorySlot_Controller : MonoBehaviour, IDropHandler
     public bool HasItem { get { return transform.childCount > 0; } }
     public UI_InventoryItem_Controller Item;
 
-    void Start()
-    {
-        Test = transform.GetSiblingIndex();
-    }
-
     public void OnDrop(PointerEventData eventData)
     {
         TryReceiveDrop(eventData.pointerDrag.GetComponentInChildren<UI_InventoryItem_Controller>());
