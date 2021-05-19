@@ -8,10 +8,10 @@ Simple Inventory framework for Unity, no UI included yet, allowing you to rig up
 2. Somewhere at the start of your gameloop initialize ItemDatabase.GenerateItems() to generate the list of items from the json file.
 2. Add an Inventory component to a GameObject
 3. Use the included functions to manipulate the inventory.
-    AddItem - add an item the inventory.
-    RemoveItem - remove quantity an item from the inventory.
-    ExchangeItem - Exchange the item in specified slot with an item from the specified slot of the target inventory.
-    SwapItem - swap items within the current inventory.
+    * AddItem - add an item the inventory.
+    * RemoveItem - remove quantity an item from the inventory.
+    * ExchangeItem - Exchange the item in specified slot with an item from the specified slot of the target inventory.
+    * SwapItem - swap items within the current inventory.
 ## Note:
 There are a couple functions left in for testing the inventory/itemdatabase:
 * Inventory.TestPrintInventory()   - as expected
